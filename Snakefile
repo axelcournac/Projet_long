@@ -1,3 +1,16 @@
+rule indexing:
+    input:
+        'data/{ref}.fa'
+    output:
+        'data/{ref}.fa.1.bt2',
+        'data/{ref}.fa.2.bt2',
+        'data/{ref}.fa.3.bt2',
+        'data/{ref}.fa.4.bt2',
+        'data/{ref}.fa.rev.1.bt2',
+        'data/{ref}.fa.rev.2.bt2'
+    shell:
+        'bowtie2-build {input} {input.ref}'
+
 rule alignment:
     input:
         left_read='data/{sample}_1.fastq',
@@ -25,7 +38,6 @@ rule sam_extraction:
         awk '{print $1,$3,$4,$2,$5;}' {input.right_old} > {output.right_new}
         """
 
-#truc perso
 rule sam_sorting:
     input:
         left_unsorted='alignment/{sample}_1.sam.0'
@@ -38,4 +50,3 @@ rule sam_sorting:
         samtools sort -n {input.left_unsorted} > {output.left_sorted}
         samtools sort -n {input.right_unsorted} > {output.right_sorted}
         """
-
