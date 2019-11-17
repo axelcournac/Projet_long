@@ -2,7 +2,7 @@ INDEX = ['1','2']
 
 rule all:
     input:
-        expand('/media/anthony/POULOP/data/alignment/SRR9900851_{index}.sam.0', index = INDEX)
+        expand('/media/anthony/POULOP/data/alignment/SRR9900851_{index}.sam.0.sorted', index = INDEX)
                           
 rule indexing:
     input:
@@ -44,4 +44,17 @@ rule sam_extraction:
         """
         awk '{{print $1,$3,$4,$2,$5;}}' {input.left_old} > {output.left_new}
         awk '{{print $1,$3,$4,$2,$5;}}' {input.right_old} > {output.right_new}
+        """
+
+rule sam_sorting:
+    input:
+        left_unsorted='/media/anthony/POULOP/data/alignment/{sample}_1.sam.0',
+        right_unsorted='/media/anthony/POULOP/data/alignment/{sample}_2.sam.0'
+    output:
+        left_sorted='/media/anthony/POULOP/data/alignment/{sample}_1.sam.0.sorted',
+        right_sorted='/media/anthony/POULOP/data/alignment/{sample}_2.sam.0.sorted'
+    shell:
+        """
+        sort -V -k1 {input.left_unsorted} > {output.left_sorted}
+        sort -V -k1 {input.right_unsorted} > {output.right_sorted}
         """
