@@ -2,7 +2,7 @@ INDEX = ['1','2']
 
 rule all:
     input:
-        '/media/anthony/POULOP/data/alignment/SRR9900851.1_SRR9900851.2_merged'
+        '/media/anthony/POULOP/data/alignment/SRR9900851_merged_quality_filtered.dat'
                           
 rule indexing:
     input:
@@ -66,4 +66,18 @@ rule pairing:
     output:
         '/media/anthony/POULOP/data/alignment/{sample}.1_{sample}.2_merged'
     shell:
-        'paste {input.left} {input.right} > {output}'
+        """
+         paste {input.left} {input.right} > {output}
+         rm {input.left} {input.right}
+         """
+
+rule quality_filtering:
+    input:
+        '/media/anthony/POULOP/data/alignment/{sample}.1_{sample}.2_merged'
+    output:
+        '/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat'
+    shell:
+        """
+        awk '{{if($1==$6 && $5>= 30 && $10 >= 30) print $2,$3,$4,$7,$8,$9}}'  {input}  > {output}
+        rm {input}
+        """
