@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# give a SRR number and do the rest :)
+
+# downloading of the reads data from sra servor: 
+# the argument is the identifiant of SRA (ex: SRR6675327	)
+/home/axel/Bureau/tools/sratoolkit.2.10.0-ubuntu64/bin/fastq-dump  --split-3 $1 -O .
+
+# alignment of the reads on reference genome:
+bowtie2 -x  hg19 -p18 --sam-no-hd --sam-no-sq --local --very-sensitive-local -S $1"_1.fastq.sam" $1"_1.fastq"
+bowtie2 -x  hg19 -p18 --sam-no-hd --sam-no-sq --local --very-sensitive-local -S $1"_2.fastq.sam" $1"_2.fastq"
+
+#  Keeping only the columns of the sam file that contain necessary information
+awk '{print $1,$3,$4,$2,$5;}' $1"_1.fastq.sam" > p1.sam.0
+awk '{print $1,$3,$4,$2,$5;}' $1"_2.fastq.sam" > p2.sam.0
+
+# Sort according to the read identification to have both mates in the same order
+sort -T /media/axel/RSG4/tmp -V -k1 p1.sam.0 > p1.sam.0.sorted
+sort -T /media/axel/RSG4/tmp -V -k1 p2.sam.0 > p2.sam.0.sorted
+
+# Pairing of both mates in a sigle file
+paste p1.sam.0.sorted p2.sam.0.sorted > p1_p2_merged
+
+# Removal of intermediar files
+rm p1.sam.0.sorted
+rm p2.sam.0.sorted
+
+# Filtering of paires of reads that both have a Mapping Quality above 30 :
+awk '{if($1==$6 && $5>= 30 && $10 >= 30) print $2,$3,$4,$7,$8,$9}'  p1_p2_merged  > output_alignment_idpt_$1.dat
+
+# Removal of intermediar file
+rm p1_p2_merged
+
+# Attribution of restriction fragments: 
+python /home/axel/Bureau/z_python_scripts/fragment_attribution.py  /h/media/axel/d0a28364-6c64-4f8e-9efc-f332d9a0f1a9/droso_2019/dm3/fasta $(pwd)"/"output_alignment_idpt_$1.dat 
+
+# Filtering of non informative events: 
+python /home/axel/Bureau/z_python_scripts/library_events_ARG.py output_alignment_idpt_$1.dat".indices" 4  2 $1 
+
+# creation of the sparse objects (matrices) and file in bed2d format: 
+python3 /home/axel/Bureau/z_python_scripts/convert_pairs_bed2d.py $(pwd)"/"output_alignment_idpt_$1.dat".indices.filtered"  
+
+mkdir sparse_objects_$1
+mv chr* sparse_objects_$1
+
+rm *.fastq
+rm *.sam
+rm *.0
+
+rm *.dat
+rm *.indices
+
+# Agglomerated plot analysis: 
+#python3 /home/axel/Bureau/z_python_scripts/agglomerated_sparse_ARG_droso.py sparse_objects_$1  $1
+
+echo "THE END!!"
+
+
+
+
+
+
