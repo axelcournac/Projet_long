@@ -2,7 +2,7 @@ INDEX = ['1','2']
 
 rule all:
     input:
-        '/media/anthony/POULOP/data/alignment/SRR9900851_merged_quality_filtered.dat.indices'
+        '/media/anthony/POULOP/data/alignment/SRR9900851.merged_qualfilt.dat.indices'
                           
 rule indexing:
     input:
@@ -64,36 +64,25 @@ rule pairing:
         left='/media/anthony/POULOP/data/alignment/{sample}_1.sam.0.sorted',
         right='/media/anthony/POULOP/data/alignment/{sample}_2.sam.0.sorted'
     output:
-        '/media/anthony/POULOP/data/alignment/{sample}.1_{sample}.2_merged'
+        '/media/anthony/POULOP/data/alignment/{sample}.merged.dat'
     shell:
         """
          paste {input.left} {input.right} > {output}
-         rm {input.left} {input.right}
          """
 
 rule quality_filtering:
     input:
-        '/media/anthony/POULOP/data/alignment/{sample}.1_{sample}.2_merged'
+        '/media/anthony/POULOP/data/alignment/{sample}.merged.dat'
     output:
-        '/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat'
+        '/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat'
     shell:
-        """
-        awk '{{if($1==$6 && $5>= 30 && $10 >= 30) print $2,$3,$4,$7,$8,$9}}'  {input}  > {output}
-        rm {input}
-        """
-        
-rule fragment_attribution:
+        "awk '{{if($1==$6 && $5>= 1 && $10 >= 1) print $2,$3,$4,$7,$8,$9}}'  {input}  > {output}"
+
+rule fragment_restriction:
     input:
         genome='/media/anthony/POULOP/data/',
-        align='/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat'
-    script:
-        "examples_codes/fragment_attribution.py {input.genome} {input.align}"
-        
-rule last_filtering:
-    input:
-        '/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat'
+        align='/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat'
     output:
-        '/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat.indices'
+        '/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices'
     script:
-        "examples/codes/library_events_ARG.py {output} 4 2 {sample}"
-        
+        "examples_codes/fragment_attribution.py {input.genome} HindIII {input.align}"
