@@ -2,7 +2,7 @@ INDEX = ['1','2']
 
 rule all:
     input:
-        expand('/media/anthony/POULOP/data/alignment/SRR9900851_{index}.sam.0.sorted', index = INDEX)
+        '/media/anthony/POULOP/data/alignment/SRR9900851.1_SRR9900851.2_merged'
                           
 rule indexing:
     input:
@@ -58,3 +58,12 @@ rule sam_sorting:
         sort -V -k1 {input.left_unsorted} > {output.left_sorted}
         sort -V -k1 {input.right_unsorted} > {output.right_sorted}
         """
+        
+rule pairing:
+    input:
+        left='/media/anthony/POULOP/data/alignment/{sample}_1.sam.0.sorted',
+        right='/media/anthony/POULOP/data/alignment/{sample}_2.sam.0.sorted'
+    output:
+        '/media/anthony/POULOP/data/alignment/{sample}.1_{sample}.2_merged'
+    shell:
+        'paste {input.left} {input.right} > {output}'
