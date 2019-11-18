@@ -81,3 +81,10 @@ rule quality_filtering:
         awk '{{if($1==$6 && $5>= 30 && $10 >= 30) print $2,$3,$4,$7,$8,$9}}'  {input}  > {output}
         rm {input}
         """
+        
+rule fragment_attribution:
+    input:
+        genome='/media/anthony/POULOP/data/',
+        align='/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat'
+    script:
+        "examples_codes/fragment_attribution.py {input.genome} {input.align}"
