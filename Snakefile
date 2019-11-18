@@ -2,7 +2,7 @@ INDEX = ['1','2']
 
 rule all:
     input:
-        '/media/anthony/POULOP/data/alignment/SRR9900851_merged_quality_filtered.dat'
+        '/media/anthony/POULOP/data/alignment/SRR9900851_merged_quality_filtered.dat.indices'
                           
 rule indexing:
     input:
@@ -88,3 +88,12 @@ rule fragment_attribution:
         align='/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat'
     script:
         "examples_codes/fragment_attribution.py {input.genome} {input.align}"
+        
+rule last_filtering:
+    input:
+        '/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat'
+    output:
+        '/media/anthony/POULOP/data/alignment/{sample}_merged_quality_filtered.dat.indices'
+    script:
+        "examples/codes/library_events_ARG.py {output} 4 2 {sample}"
+        
