@@ -2,7 +2,7 @@ INDEX = ['1','2']
 
 rule all:
     input:
-        '/media/anthony/POULOP/data/alignment/SRR9900851.merged_qualfilt.dat.indices'
+        '/media/anthony/POULOP/data/alignment/SRR9900851.merged_qualfilt.dat.indices.filtered.bed2'
                           
 rule indexing:
     input:
@@ -86,3 +86,23 @@ rule fragment_restriction:
         '/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices'
     script:
         "examples_codes/fragment_attribution.py"
+        
+rule event_filtering:
+    input:
+        file='/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices'
+    params:
+        uncut_threshold='4',
+        loop_threshold='2',
+        srr='{sample}'
+    output:
+        '/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices.filtered'
+    script:
+        "examples_codes/library_events_ARG.py"
+        
+rule creating:
+    input:
+        '/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices.filtered'
+    output:
+        "/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices.filtered.bed2"
+    script:
+        "examples_codes/convert_pairs_bed2d.py"
