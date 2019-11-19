@@ -19,7 +19,7 @@ import sys
 import pandas as pd 
 
 # Parameters to enter:
-filename1 = sys.argv[1]
+filename1 = snakemake.input[0]
 
 #list_all_chrms=('NC_003421.2','NC_003423.3','NC_003424.3')
 
@@ -190,7 +190,7 @@ for c1, c2 in mat_chro.keys():
              
 # writting into bed 2D file:   
 #    chr1	0	1000	chr1	0	1000	118
-f_out  = open('contacts_df.bg2',"w+")  
+f_out  = open(snakemake.input[0]+'.bed2',"w+")  
       
 for c1, c2 in mat_chro.keys() :
     mat_chro[c1,c2] = coo_matrix(mat_chro[c1,c2])
@@ -210,9 +210,3 @@ for c1, c2 in mat_chro.keys() :
                        v_data], fmt='%s', delimiter ="\t")
 
 f_out.close()
-        
-        
-        
-        
-        
-        
