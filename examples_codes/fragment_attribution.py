@@ -17,23 +17,25 @@ print("Arguments to enter:\n")
 print("Path for fasta files of genome (ex: /run/media/axel/human_genome/), Restriction enzyme (ex: HindIII), Alignment file (ex: /data/output_alignment_idpt.dat)\n")
 
 #path="/run/media/axel/RSG3/human_genome/"   #  path containing the fasta files of the chromosomes 
-path=sys.argv[1]
+#path=sys.argv[1]
+path = snakemake.input[0]
 os.chdir(path)
 
 list_chrms1 =  glob.glob("*.fa")
 list_chrms2 =  glob.glob("*.fasta")
 list_chrms=list_chrms1+list_chrms2
 
-#enz=HindIII   #   Restriction enzyme used in the experiment 
-enz=sys.argv[2]
+enz=HindIII   #   Restriction enzyme used in the experiment 
+#enz=sys.argv[2]
+
 print("Enzyme used:"+str(enz)+"\n")
 
 rb = RestrictionBatch([enz])    #  Restriction batch containing the restriction enzyme
 restriction_table={}
 
 for chr_file in list_chrms :
-    chr_name= chr_file.replace(".fa", "")
-    chr_name= chr_name.replace(".fasta", "")
+    chr_name= chr_file.replace(".fasta", "")
+    chr_name= chr_name.replace(".fa", "")
     print("Cutting the following chromosome:")
     print(chr_name+"\n")
 
@@ -51,10 +53,9 @@ for chr_file in list_chrms :
     end_positions= map_restriction 
     # Adding end position of the chromosome to the end positions of restriction fragments:
     end_positions = np.insert(end_positions, len(end_positions), len(record))
-    restriction_table[chr_name] = vstack((start_positions,end_positions))
-
+    restriction_table[chr_name] = vstack((start_positions,end_positions)) #global variable ?
+#Attention les noms des fichier.fa doivent être du genre : NC_001138.5
 print("Restriction maps of all chromosomes are now in memory!\n")
-
 #  Function to assign the corresponding restriction fragment to a locus.
 def find_frag(chrm,locus) :
     T=restriction_table[chrm]
@@ -72,13 +73,14 @@ def find_frag(chrm,locus) :
     return indice
 
 
-# Reading of the output file from the alignment 
-fout = open(sys.argv[3]+".indices","w")#  output file that will contain the indices 
+# Reading of the output file from the alignment
+#sys.argv[3] devrait remplacer snakemake.input[1] en dessous
+fout = open(snakemake.input[1]+".indices","w")#  output file that will contain the indices 
 #fout = open("/home/axel/Bureau/output_alignment_idpt.dat3","w")
 
 i=0
 #with open("/home/axel/Bureau/output_alignment_idpt.dat") as f: # open the file for reading
-with open(sys.argv[3]) as f: # open the file for reading
+with open(snakemake.input[1]) as f: # open the file for reading
     for line in f: # iterate over each line
         i=i+1
         if i % 1000000 == 0:
