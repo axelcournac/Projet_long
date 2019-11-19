@@ -9,11 +9,16 @@ import matplotlib.pyplot as plt
 from pylab import *
 import sys
 
-bank = sys.argv[4]
+bank = snakemake.params[2]
+#sys.argv[0] = .dat.indices
+#sys.params[0] = uncut_threshold
+#sys.params[1] = loop_threshold
+#sys.params[2] = SRR
+#output = .dat.indices.filtered
 
 noccurences=np.zeros( (4,500) );
 i=0;
-with open(sys.argv[1]) as f: # open the file for reading (just the first 1 000 000 lines)
+with open(snakemake.input[0]) as f: # open the file for reading (just the first 1 000 000 lines)
     for line in f: 
         i=i+1;
         if i % 1000000 == 0:
@@ -55,10 +60,10 @@ savefig("behavior_events"+bank+".png");
 #  Scanning the alignment file again and count the different events with the determined thresholds:
 #print("Enter threshold for the uncuts events (+-):")
 #thr_uncut= input()
-thr_uncut=int(sys.argv[2])
+thr_uncut=int(snakemake.params[0])
 #print("Enter threshold for the loops events (-+):")
 #thr_loop= input();
-thr_loop= int(sys.argv[3]);
+thr_loop= int(snakemake.params[1]);
 
 thr_weirds = 0;
       
@@ -70,9 +75,9 @@ lrange_intra=0;lrange_inter=0;
 n_mito=0;
 
 i=0;
-fout = open(sys.argv[1]+".filtered","w")
+fout = open(snakemake.input[0]+".filtered","w")
 
-with open(sys.argv[1]) as f: # open the file for reading
+with open(snakemake.input[0]) as f: # open the file for reading
     for line in f: # iterate over each line
         i=i+1;
         if i % 1000000 == 0:
