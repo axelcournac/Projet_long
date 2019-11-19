@@ -85,4 +85,4 @@ rule fragment_restriction:
     output:
         '/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices'
     script:
-        "examples_codes/fragment_attribution.py {input.genome} HindIII {input.align}"
+        "examples_codes/fragment_attribution.py"
