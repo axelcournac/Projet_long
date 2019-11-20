@@ -1,0 +1,20 @@
+Second week:
+
+- créer des cartes de contact
+
+deux axes:
+
+- projet levure:
+
+Identifier des protéines à partir des données de ChIPseq de la levure qui seraient enrichies sur un jeu de positions génomiques 
+en l'occurence des positions que l'on a identifiées comme étant des boucles chromosomiques dans le but de trouver un partenaire de 
+la cohésine. 
+
+ex de protéine: 
+- Smc2, Smc4, Brn1 (contrôle positive)
+- Pds5, TFIII,  TFIIC
+
+
+- projet humain/ souris
+créer les agglomerated plots autour d'objets biologiques intéressants:
+ex: TSS, CpG, LTR et autres 
