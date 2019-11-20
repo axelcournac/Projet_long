@@ -2,7 +2,7 @@ INDEX = ['1','2']
 
 rule all:
     input:
-        '/media/anthony/POULOP/data/alignment/SRR9900851.merged_qualfilt.dat.indices.filtered.bed2'
+        '/media/anthony/POULOP/data/Contact/SRR9900851.bed2'
                           
 rule indexing:
     input:
@@ -106,3 +106,17 @@ rule creating:
         "/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices.filtered.bed2"
     script:
         "examples_codes/convert_pairs_bed2d.py"
+
+rule post_processing:
+    input:
+        bad_name='/media/anthony/POULOP/data/alignment/{sample}.merged_qualfilt.dat.indices.filtered.bed2'
+    output:
+        good_name='/media/anthony/POULOP/data/Contact/{sample}.bed2'
+    shell:
+        """
+        mv {input.bad_name} {output.good_name}
+        mv *.npz /media/anthony/POULOP/data/Contact
+        mv *.png /media/anthony/POULOP/data/Contact
+        rm /media/anthony/POULOP/data/alignment/*.dat
+        rm /media/anthony/POULOP/data/alignment/*.indices
+        """
